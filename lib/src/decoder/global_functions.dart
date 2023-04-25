@@ -81,17 +81,18 @@ Result? decodeImage(Map<dynamic, dynamic> map) {
 // Color
 imgLib.Image _convertBGRA8888(CameraImage image) {
   return imgLib.Image.fromBytes(
-    image.width,
-    image.height,
-    image.planes[0].bytes,
-    format: imgLib.Format.bgra,
+    width: image.width,
+    height: image.height,
+    bytes: image.planes[0].bytes.buffer,
+    format: imgLib.Format.uint8,
   );
 }
 
 // CameraImage YUV420_888 -> PNG -> Image (compresion:0, filter: none)
 // Black
 imgLib.Image _convertYUV420(CameraImage image) {
-  var img = imgLib.Image(image.width, image.height); // Create Image buffer
+  var img = imgLib.Image(
+      width: image.width, height: image.height); // Create Image buffer
 
   var plane = image.planes.first;
   const shift = 0xFF << 24;
@@ -107,7 +108,7 @@ imgLib.Image _convertYUV420(CameraImage image) {
       // Calculate pixel color
       var newVal = shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
 
-      img.data[planeOffset + x] = newVal;
+      img.data!.toUint8List()[planeOffset + x] = newVal;
     }
   }
 
